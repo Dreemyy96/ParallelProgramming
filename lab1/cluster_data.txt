@@ -1,0 +1,5 @@
+1
+Intel-Xeon 8 3.6
+NvidiaRtx3080 10240 8704
+DDR4 32768
+IntelEthernet 1
