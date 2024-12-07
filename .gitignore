@@ -1,0 +1,25 @@
+# Visual Studio
+.vscode/
+*.exe
+*.obj
+*.o
+*.pdb
+*.ipch
+*.db
+*.log
+*.sdf
+*.idb
+*.opendb
+*.VC.db
+*.VC.opendb
+
+# C++
+*.out
+*.a
+*.so
+*.dll
+*.class
+
+# OS files
+.DS_Store
+Thumbs.db
