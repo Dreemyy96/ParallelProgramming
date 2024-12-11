@@ -1,73 +1,94 @@
 #include <iostream>
-#include "MatrixDense.h"
-#include "MatrixDiagonal.h"
-#include "MatrixBlock.h"
+#include "MatrixDense.cpp"
+#include "MatrixDiagonal.cpp"
+#include "MatrixBlock.cpp"
 
 int main() {
     try {
-        // Пример работы с MatrixDense
-        std::cout << "=== MatrixDense Example ===\n";
-        MatrixDense<> denseMatrix(3, 3);
-        denseMatrix(0, 0) = 1.0; denseMatrix(0, 1) = 2.0; denseMatrix(0, 2) = 3.0;
-        denseMatrix(1, 0) = 4.0; denseMatrix(1, 1) = 5.0; denseMatrix(1, 2) = 6.0;
-        denseMatrix(2, 0) = 7.0; denseMatrix(2, 1) = 8.0; denseMatrix(2, 2) = 9.0;
-        denseMatrix.print();
+        MatrixDense<double> matrix1(3, 4);
+        for (unsigned i = 0; i < 3; ++i) {
+            for (unsigned j = 0; j < 4; ++j) {
+                matrix1(i, j) = i * 4 + j;
+            }
+        }
 
-        std::cout << "Transpose of denseMatrix:\n";
-        auto transposedDense = denseMatrix.transpose();
-        transposedDense.print();
+        matrix1.exportToFile("matrix1.txt");
 
-        denseMatrix.exportToFile("denseMatrix.txt");
-        std::cout << "denseMatrix exported to 'denseMatrix.txt'.\n";
+        MatrixDense<double> matrix2(0, 0);
+        matrix2.importFromFile("matrix1.txt");
 
-        // Пример работы с MatrixDiagonal
-        std::cout << "\n=== MatrixDiagonal Example ===\n";
-        MatrixDiagonal<> diagMatrix(3);
-        diagMatrix(0, 0) = 1.0; diagMatrix(1, 1) = 2.0; diagMatrix(2, 2) = 3.0;
-        diagMatrix.print();
+        matrix2.print();
 
-        std::cout << "Transpose of diagMatrix:\n";
-        auto transposedDiag = diagMatrix.transpose();
-        transposedDiag.print();
+        MatrixDense<double> matrix3 = matrix1;
+        matrix3.print();
 
-        diagMatrix.exportToFile("diagMatrix.txt");
-        std::cout << "diagMatrix exported to 'diagMatrix.txt'.\n";
+        MatrixDense<double> matrix4(2, 2);
+        matrix4 = matrix1;
 
-        // Пример работы с MatrixBlock
-        std::cout << "\n=== MatrixBlock Example ===\n";
-        MatrixBlock<> blockMatrix(2, 2, 2); // 2x2 матрица блоков, каждый блок размером 2x2
+        MatrixDiagonal<int> diag1(3);
+        diag1(0, 0) = 1;
+        diag1(1, 1) = 5;
+        diag1(2, 2) = 9;
 
-        // Заполнение блоков
-        auto denseBlock1 = std::make_unique<MatrixDense<>>(2, 2);
-        (*denseBlock1)(0, 0) = 1.0; (*denseBlock1)(0, 1) = 2.0;
-        (*denseBlock1)(1, 0) = 3.0; (*denseBlock1)(1, 1) = 4.0;
+        diag1.print();
 
-        auto denseBlock2 = std::make_unique<MatrixDense<>>(2, 2);
-        (*denseBlock2)(0, 0) = 5.0; (*denseBlock2)(0, 1) = 6.0;
-        (*denseBlock2)(1, 0) = 7.0; (*denseBlock2)(1, 1) = 8.0;
+        diag1.exportToFile("diag1.txt");
 
-        blockMatrix(0, 0) = denseBlock1.release();
-        blockMatrix(0, 1) = denseBlock2.release();
+        MatrixDiagonal<int> diag2(0);
+        diag2.importFromFile("diag1.txt");
 
-        std::cout << "Block Matrix:\n";
+        diag2.print();
+
+                MatrixDiagonal<int> diag3 = diag1;
+                diag3.print();
+                MatrixDiagonal<int> diag4(2);
+                diag4 = diag1;
+                diag4.print();
+        MatrixDiagonal<int> diag5(3);
+        diag5(0,0) = 2;
+        diag5(1,1) = 3;
+        diag5(2,2) = 4;
+
+        Matrix<int>* res = diag1 * diag5;
+
+        res->print();
+
+        delete res;
+        
+        MatrixBlock<int> blockMatrix(2, 2, 3);
+
+        MatrixDense<int>* block1 = new MatrixDense<int>(3, 3);
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                (*block1)(i, j) = i * 3 + j + 1;
+            }
+        }
+
+        MatrixDense<int>* block2 = new MatrixDense<int>(3,3);
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                (*block2)(i, j) = i + j + 1;
+            }
+        }
+        blockMatrix.setBlock(0, 0, block1);
+        blockMatrix.setBlock(1,1, block2);
+
         blockMatrix.print();
+        blockMatrix.exportToFile("block_matrix.txt");
 
-        auto transposedBlock = blockMatrix.transpose();
-        std::cout << "Transpose of Block Matrix:\n";
-        transposedBlock.print();
+        MatrixBlock<int> blockMatrixFromFile(0,0,0);
+        blockMatrixFromFile.importFromFile("block_matrix.txt");
+        blockMatrixFromFile.print();
 
-        blockMatrix.exportToFile("blockMatrix.txt");
-        std::cout << "blockMatrix exported to 'blockMatrix.txt'.\n";
+        MatrixBlock<int> blockMatrix_copy = blockMatrix;
+        blockMatrix_copy.print();
+        MatrixBlock<int> blockMatrix_copy2(1,1,1);
+        blockMatrix_copy2 = blockMatrix;
+        blockMatrix_copy2.print();
 
-        std::cout << "\n=== Kronecker Product Example ===\n";
-        auto kronMatrix = blockMatrix.kroneckerProduct(blockMatrix);
-        kronMatrix.print();
-        kronMatrix.exportToFile("kronMatrix.txt");
-        std::cout << "Kronecker product matrix exported to 'kronMatrix.txt'.\n";
-
-    } catch (const std::exception& ex) {
-        std::cerr << "Error: " << ex.what() << '\n';
+    } catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
     }
-
     return 0;
 }
