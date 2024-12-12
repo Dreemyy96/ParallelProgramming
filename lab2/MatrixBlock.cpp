@@ -1,4 +1,5 @@
 #include "Matrix.h"
+#include "MatrixDense.cpp"
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
@@ -131,7 +132,7 @@ public:
         for (size_t i = 0; i < _blockRows; ++i) {
             for (size_t j = 0; j < _blockCols; ++j) {
                 if (_blocks[i * _blockCols + j] != nullptr && otherBlock->_blocks[i * _blockCols + j] != nullptr) {
-                    result->setBlock(i, j, *(_blocks[i * _blockCols + j] + *(otherBlock->_blocks[i * _blockCols + j]))); 
+                    result->setBlock(i, j, *(_blocks[i * _blockCols + j]->operator+(*(otherBlock->_blocks[i * _blockCols + j])))); 
                 } 
             }
         }
@@ -154,7 +155,7 @@ public:
         for (size_t i = 0; i < _blockRows; ++i) {
             for (size_t j = 0; j < _blockCols; ++j) {
                 if (_blocks[i * _blockCols + j] != nullptr && otherBlock->_blocks[i * _blockCols + j] != nullptr) {
-                    result->setBlock(i, j, *(_blocks[i * _blockCols + j] - *(otherBlock->_blocks[i * _blockCols + j]))); 
+                    result->setBlock(i, j, *(_blocks[i * _blockCols + j]->operator-(*(otherBlock->_blocks[i * _blockCols + j])))); 
                 } 
             }
         }
@@ -179,7 +180,7 @@ public:
                 MatrixDense<T>* blockSum = new MatrixDense<T>(_blockSize, _blockSize);
                 for (size_t k = 0; k < _blockCols; ++k) {
                     if (_blocks[i * _blockCols + k] != nullptr && otherBlock->_blocks[k * otherBlock->_blockCols + j] != nullptr) {
-                        *blockSum = *blockSum + *(_blocks[i * _blockCols + k] * *(otherBlock->_blocks[k * otherBlock->_blockCols + j])); 
+                        *blockSum = *blockSum + *(_blocks[i * _blockCols + k]->operator*(*(otherBlock->_blocks[k * otherBlock->_blockCols + j]))); 
                     }
                 }
                 result->setBlock(i, j, blockSum);
